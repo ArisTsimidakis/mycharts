@@ -72,8 +72,9 @@ jobs:
       
       - name: Print SonarCloud result
         shell: bash
-        run: jq . results_${{ inputs.iteration }}.json
-
+        run: |
+          jq . results_${{ inputs.iteration }}.json
+          jq . {{ inputs.chart_folder }}
       - name: Upload the JASON results artifact
         uses: actions/upload-artifact@v4
         with:
