@@ -47,6 +47,7 @@ jobs:
           echo "sonar.organization=aristsimidakis" > ${{ inputs.chart_folder }}/sonar-project.properties
           echo "sonar.projectKey=ArisTsimidakis_mycharts" >> ${{ inputs.chart_folder }}/sonar-project.properties
           echo "sonar.projectName=mycharts" >> ${{ inputs.chart_folder }}/sonar-project.properties
+          echo "sonar.sources=." >> ${{ inputs.chart_folder }}/sonar-project.properties
 
       - name: Run SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v3.1
@@ -66,7 +67,7 @@ jobs:
         run: |
           PROJECT_KEY="ArisTsimidakis_mycharts"
           ORGANIZATION="aristsimidakis"
-          PARAMS="s=FILE_LINE&issueStatuses=OPEN%2CCONFIRMED&ps=100&facets=cleanCodeAttributeCategories%2CimpactSoftwareQualities%2CimpactSeverities"
+          PARAMS="s=UPDATE_DATE&issueStatuses=OPEN%2CCONFIRMED&ps=100&facets=cleanCodeAttributeCategories%2CimpactSoftwareQualities%2CimpactSeverities"
           SONAR_API="https://sonarcloud.io/api/issues/search?${PARAMS}&componentKeys=${PROJECT_KEY}&organization=${ORGANIZATION}&additionalFields=_all"
 
           curl --request GET --url $SONAR_API > results_${{ inputs.iteration }}.json
