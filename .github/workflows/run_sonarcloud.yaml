@@ -58,6 +58,12 @@ jobs:
             -Dsonar.scanner.dumpToFile=sonar-scanner-dump.log
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # There is an issue where the fetched report is always one scan behind
+      # Attempt to fix it by just waiting (?)
+      # I hate this tool
+      - name: Wait for SonarCloud😭
+        run: sleep 10
       
       - name: Fetch SonarCloud Report
         shell: bash
