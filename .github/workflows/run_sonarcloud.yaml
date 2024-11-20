@@ -60,7 +60,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       # There is an issue where the fetched report is always one scan behind
-      # Attempt to fix it by just waiting (?)
+      # This is fixed by just waiting a bit before fetching the report
       # I hate this tool
       - name: Wait for SonarCloud😭
         run: sleep 10

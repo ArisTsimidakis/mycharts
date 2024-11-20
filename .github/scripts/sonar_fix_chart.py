@@ -20,6 +20,7 @@ import re
 import os
 import copy
 import json
+import yaml
 import fix_template
 import terrascan_fix_chart
 
@@ -36,14 +37,16 @@ def remove_duplicates(json_file: str) -> None:
     seen_issues = set()
     unique_issues = []
     
-    for issue in data.get("issues", []):
-        identifier = (issue.get("rule"), issue.get("component"), issue.get("line"))
+    for issue in data["issues"]:
+        identifier = (issue["rule"], issue["component"], issue["line"])
         
         if identifier not in seen_issues:
             seen_issues.add(identifier)
             unique_issues.append(issue)
     
-    print(f"Unique issues: {unique_issues}")
+    for identifier in seen_issues:
+        print(identifier)
+    
     print(f"\nTotal number of unique issues: {len(unique_issues)}")
     data["issues"] = unique_issues
     data["total"] = len(unique_issues)
@@ -92,26 +95,41 @@ def iterate_checks(chart_folder: str, json_path: str) -> None:
     print(", ".join(all_checks))
 
 
-    name = f"fixed_{chart_folder}_sonar_fixed"
-    fix_template.save_yaml_template(template, name)
+    # name = f"fixed_{chart_folder}_sonar_fixed"
+    # fix_template.save_yaml_template(template, name)
 
 
-def fix_issue(issue, template: dict) -> str:
+def fix_issue(issue: dict, template: dict) -> str:
     """Fixes a check based on the Sonar check identifier.
 
     Args:
         issue (dict): The issue to fix.
         template (dict): The template to fix.
     """
-    check_id = issue.get("rule")
-    function = LookupClass.get_value(check_id)
+    # Get corresponding function from lookup table
+    my_lookup = LookupClass()
+    check_id = my_lookup.get_value(issue["rule"])
+    
+    # Check if function exists and call it
+    if check_id:
+        sonar_fix_issue(issue, template, check_id)
+        return check_id
+    else:
+        print(f"No fix found for rule: {issue['rule']}")
+        return None 
+    
 
-    if function is None:
-        print(f"No fix found for rule {check_id}")
-        return None
+def sonar_fix_issue(issue: dict, template: dict, check_id: str) -> None:
+    """Fixes a check based on the corresponding Sonar rule
 
-    function = getattr(fix_template, function)
-    return function(template, issue)
+    Args:
+        issue (dict): The issue to fix as parsed from the JSON file.
+        template (dict): The parsed YAML template.
+        check_id (str): The ID of the check to fix.
+    """
+    
+        
+    
 
 
 def fix_whitespace_issue(chart_folder:str, issue: dict) -> str:
@@ -122,11 +140,12 @@ def fix_whitespace_issue(chart_folder:str, issue: dict) -> str:
         issue (dict): The issue to fix.
     """
 
-    check_id = issue.get("rule")
-    file_path = issue.get("component").split[':'][1]
-    line_number = issue.get("line")
-    start_offset = issue.get("textRange").get("startOffset")
-    end_offset = issue.get("textRange").get("endOffset")
+    check_id = issue["rule"]
+    file_path = issue["component"].split[':'][1]
+    file_path = os.path.join(chart_folder, file_path)
+    line_number = issue["line"]
+    start_offset = issue["textRange"]["startOffset"]
+    end_offset = issue["textRange"]["endOffset"]
 
     try:
         with open(file_path, 'r') as file:
@@ -134,11 +153,14 @@ def fix_whitespace_issue(chart_folder:str, issue: dict) -> str:
         
         line = lines[line - 1]
         pre_fix = line[start_offset:end_offset]
-        fixed_line = line[:start_offset] + " " + pre_fix.lstrip() + line[end_offset:]
+        fixed_line = line[:start_offset] + " " + pre_fix.lstrip() + " " + line[end_offset:]
         lines[line - 1] = fixed_line
         
-        with open(file_path, 'w') as file:
-            file.writelines(lines)
+        print(f"Line before fixing: {line}")
+        print(f"Line after fixing: {fixed_line}")
+        
+        # with open(file_path, 'w') as file:
+        #    file.writelines(lines)
 
         print(f"Fixed whitespace issue in {file_path} at line {line_number}")
         return check_id
@@ -156,7 +178,9 @@ class LookupClass:
     """
 
     _LOOKUP = {
-        
+        "kubernetes:S6892": "check_4",  # Specify a CPU request
+        "kubernetes:S6873": "check_1",  # Specify a memory request
+        "kubernetes:S6864": "check_2",  # Specify a memory limit
     }
 
     @classmethod
@@ -174,4 +198,7 @@ class LookupClass:
         print(cls._LOOKUP.get(key))
 
 if __name__ == "__main__":
-    remove_duplicates("sonar_result.json")
+    chart_folder = "templates/harbor"
+    results_path = ".github/scripts/sonar_result.json"
+    
+    iterate_checks(chart_folder, results_path)
