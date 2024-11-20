@@ -44,15 +44,14 @@ jobs:
       - name: Create sonar-project.properties
         shell: bash
         run: |
-          echo "sonar.organization=aristsimidakis" > templates/sonar-project.properties
-          echo "sonar.projectKey=ArisTsimidakis_mycharts" >> templates/sonar-project.properties
-          echo "sonar.projectName=mycharts" >> templates/sonar-project.properties
-          echo "sonar.sources=./${{ inputs.chart_folder }}_template.yaml" >> templates/sonar-project.properties
+          echo "sonar.organization=aristsimidakis" > sonar-project.properties
+          echo "sonar.projectKey=ArisTsimidakis_mycharts" >> sonar-project.properties
+          echo "sonar.projectName=mycharts" >> sonar-project.properties
+          echo "sonar.sources=templates/${{ inputs.chart_folder }}_template.yaml" >> sonar-project.properties
 
       - name: Run SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v3.1
         with:
-          projectBaseDir: templates 
           args: >
             -Dsonar.verbose=true
             -Dsonar.log_level=DEBUG
@@ -85,7 +84,7 @@ jobs:
       
       - name: Clean up sonar-project.properties
         shell: bash
-        run: rm templates/sonar-project.properties
+        run: rm sonar-project.properties
 
 
       
