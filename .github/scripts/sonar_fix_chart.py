@@ -95,8 +95,8 @@ def iterate_checks(chart_folder: str, json_path: str) -> None:
     print(", ".join(all_checks))
 
 
-    # name = f"fixed_{chart_folder}_sonar_fixed"
-    # fix_template.save_yaml_template(template, name)
+    name = f"fixed_{chart_folder}_sonar_fixed"
+    fix_template.save_yaml_template(template, name)
 
 
 def fix_issue(issue: dict, template: dict) -> str:
@@ -127,6 +127,20 @@ def sonar_fix_issue(issue: dict, template: dict, check_id: str) -> None:
         template (dict): The parsed YAML template.
         check_id (str): The ID of the check to fix.
     """
+    # Currently we only fix the "Specify memory limits" issue
+    resource_path = "Deployment/release-name-mongodb"
+    obj_path = "spec/template/spec/containers/0"
+    obj_name = "mongodb"
+    
+    paths = {
+        "resource_path": resource_path,
+        "obj_path": obj_path
+    }
+    
+    fix_template.set_template(template, check_id, paths)
+    
+    
+    
     
         
     
@@ -198,7 +212,7 @@ class LookupClass:
         print(cls._LOOKUP.get(key))
 
 if __name__ == "__main__":
-    chart_folder = "templates/harbor"
+    chart_folder = "templates/mongodb"
     results_path = ".github/scripts/sonar_result.json"
     
     iterate_checks(chart_folder, results_path)
