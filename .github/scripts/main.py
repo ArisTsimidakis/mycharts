@@ -25,7 +25,7 @@ import kubelinter_fix_chart
 import kubeaudit_fix_chart
 import kubescape_fix_chart
 import terrascan_fix_chart
-import sonar_fix_chart
+import sonarcloud_fix_chart
 import add_functionalities
 import generate_docker_run
 import count_checks
@@ -95,7 +95,7 @@ def main():
             case "terrascan": 
                 terrascan_fix_chart.iterate_checks(chart_folder, result_path)
             case "sonarcloud": 
-                sonar_fix_chart.iterate_checks(chart_folder, result_path)
+                sonarcloud_fix_chart.iterate_checks(chart_folder, result_path)
             case _: 
                 print(f"Tool not supported: {tool}. Exiting..."); sys.exit(1)
 
