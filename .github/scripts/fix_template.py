@@ -516,6 +516,8 @@ def set_cpu_limit(obj: dict, value="250m"):
         set_cpu_request(obj, value)
         set_memory_limit(obj)
         set_memory_request(obj)
+        set_storage_limit(obj)
+        set_storage_request(obj)
 
     if "requests" in obj["resources"] and \
         obj["resources"]["requests"] is not None and \
@@ -559,6 +561,8 @@ def set_cpu_request(obj: dict, value="250m"):
         set_cpu_limit(obj, value)
         set_memory_limit(obj)
         set_memory_request(obj)
+        set_storage_limit(obj)
+        set_storage_request(obj)
 
     if "limits" in obj["resources"] and \
         obj["resources"]["limits"] is not None and \
@@ -603,6 +607,8 @@ def set_memory_limit(obj: dict, value="128Mi"):
         set_memory_request(obj, value)
         set_cpu_limit(obj)
         set_cpu_request(obj)
+        set_storage_limit(obj)
+        set_storage_request(obj)
 
     if "requests" in obj["resources"] and \
         obj["resources"]["requests"] is not None and \
@@ -644,6 +650,8 @@ def set_memory_request(obj: dict, value="128Mi"):
         set_memory_limit(obj, value)
         set_cpu_limit(obj)
         set_cpu_request(obj)
+        set_storage_limit(obj)
+        set_storage_request(obj)
 
     if "limits" in obj["resources"] and \
         obj["resources"]["limits"] is not None and \

@@ -127,7 +127,6 @@ def sonar_fix_issue(issue: dict, template: dict, check_id: str) -> None:
         template (dict): The parsed YAML template.
         check_id (str): The ID of the check to fix.
     """
-    # Currently we only fix the "Specify memory limits" issue
     resource_path = "Deployment/release-name-mongodb"
     obj_path = "spec/template/spec/containers/0"
     obj_name = "mongodb"
