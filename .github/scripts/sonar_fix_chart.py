@@ -138,13 +138,6 @@ def sonar_fix_issue(issue: dict, template: dict, check_id: str) -> None:
     }
     
     fix_template.set_template(template, check_id, paths)
-    
-    
-    
-    
-        
-    
-
 
 def fix_whitespace_issue(chart_folder:str, issue: dict) -> str:
     """Fixes the "Add a whitespace space before }} in the template directive" issue. 
