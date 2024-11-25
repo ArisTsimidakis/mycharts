@@ -25,6 +25,7 @@ import kubelinter_fix_chart
 import kubeaudit_fix_chart
 import kubescape_fix_chart
 import terrascan_fix_chart
+import sonar_fix_chart
 import add_functionalities
 import generate_docker_run
 import count_checks
@@ -76,34 +77,26 @@ def main():
         # result_path = f"test_files/{tool}_results.json"
 
         # Check if there are any failed tests
-        if tool == "checkov":
-            checkov_fix_chart.iterate_checks(chart_folder, result_path)
 
-        elif tool == "datree":
-            datree_fix_chart.iterate_checks(chart_folder, result_path)
-
-        elif tool == "kics":
-            kics_fix_chart.iterate_checks(chart_folder, result_path)
-
-        elif tool == "kubelinter":
-            # check if result["Summary"]["ChecksStatus"] == "Failed"
-            kubelinter_fix_chart.iterate_checks(chart_folder, result_path)
-
-        elif tool == "kubeaudit":
-            # JSON format is not valid; failed checks are only given by file lines
-            kubeaudit_fix_chart.iterate_checks(chart_folder, result_path)
-
-        elif tool == "kubescape":
-            # "resourcesSeverityCounters" + "controlsSeverityCounters" + "ResourceCounters"
-            kubescape_fix_chart.iterate_checks(chart_folder, result_path)
-
-        elif tool == "terrascan":
-            # "runs" + "results"
-            terrascan_fix_chart.iterate_checks(chart_folder, result_path)
-
-        else:
-            print("Tool not supported. Exiting...")
-            sys.exit(1)
+        match tool:
+            case "checkov": 
+                checkov_fix_chart.iterate_checks(chart_folder, result_path)
+            case "datree": 
+                datree_fix_chart.iterate_checks(chart_folder, result_path)
+            case "kics": 
+                kics_fix_chart.iterate_checks(chart_folder, result_path)
+            case "kubelinter": 
+                kubelinter_fix_chart.iterate_checks(chart_folder, result_path)
+            case "kubeaudit":
+                kubeaudit_fix_chart.iterate_checks(chart_folder, result_path)
+            case "kubescape": 
+                kubescape_fix_chart.iterate_checks(chart_folder, result_path)
+            case "terrascan": 
+                terrascan_fix_chart.iterate_checks(chart_folder, result_path)
+            case "sonarcloud": 
+                sonar_fix_chart.iterate_checks(chart_folder, result_path)
+            case _: 
+                print("Tool not supported. Exiting..."); sys.exit(1)
 
     # Add required functionality to the chart
     elif args.add_func:
