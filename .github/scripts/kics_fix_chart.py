@@ -193,7 +193,7 @@ def kics_fix_issue(check: str, template: dict, check_id: str) -> str:
             "obj_path": obj_path
         }
         
-        print(paths)
+        print(f"PATHS: {paths}")
 
         if "." in obj_path:
             paths["obj_path"] = obj_path.replace(".", "/")
@@ -262,6 +262,8 @@ def kics_fix_issue(check: str, template: dict, check_id: str) -> str:
             # Remove last part of paths["obj_path"] after the last "/"
             paths["obj_path"] = "/".join(paths["obj_path"].split("/")[:-1])
 
+        print(f"PATHS 2: {paths}")
+        
         if check["query_id"] == "268ca686-7fb7-4ae9-b129-955a2a89064e":
             cont_path, containers, _ = terrascan_fix_chart.get_container_path(template, resource_path.split("/"))
             for idx in range(len(containers)):
