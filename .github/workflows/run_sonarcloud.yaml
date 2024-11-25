@@ -47,7 +47,11 @@ jobs:
           echo "sonar.organization=aristsimidakis" > sonar-project.properties
           echo "sonar.projectKey=ArisTsimidakis_mycharts" >> sonar-project.properties
           echo "sonar.projectName=mycharts" >> sonar-project.properties
-          echo "sonar.sources=templates/${{ inputs.chart_folder }}_template.yaml" >> sonar-project.properties
+          if [ "${{ inputs.iteration }}" == "1" ]; then
+            echo "sonar.sources=templates/${{ inputs.chart_folder }}_template.yaml" >> sonar-project.properties
+          else
+            echo "sonar.sources=fixed_templates/fixed_${{ inputs.chart_folder }}_${{ inputs.first_tool }}_fixed.yaml" >> sonar-project.properties
+          fi
 
       - name: Run SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v3.1
