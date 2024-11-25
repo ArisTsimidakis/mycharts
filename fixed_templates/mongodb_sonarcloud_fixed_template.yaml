@@ -149,16 +149,13 @@ spec:
       securityContext:
         fsGroup: 1001
         sysctls: []
-        runAsUser: 1000
       containers:
       - name: mongodb
         image: docker.io/bitnami/mongodb:6.0.6-debian-11-r3
         imagePullPolicy: IfNotPresent
         securityContext:
-          runAsNonRoot: false
-          runAsUser: 1000
-          runAsGroup: 1000
-          readOnlyRootFilesystem: false
+          runAsNonRoot: true
+          runAsUser: 1001
         env:
         - name: BITNAMI_DEBUG
           value: 'false'
@@ -209,9 +206,8 @@ spec:
         resources:
           limits:
             memory: 128Mi
-            cpu: 1000m
           requests:
-            cpu: 1000m
+            cpu: 250m
             memory: 128Mi
         volumeMounts:
         - name: datadir
