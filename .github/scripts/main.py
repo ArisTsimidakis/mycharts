@@ -97,7 +97,7 @@ def main():
             case "sonarcloud": 
                 sonar_fix_chart.iterate_checks(chart_folder, result_path)
             case _: 
-                print("Tool not supported. Exiting..."); sys.exit(1)
+                print(f"Tool not supported: {tool}. Exiting..."); sys.exit(1)
 
     # Add required functionality to the chart
     elif args.add_func:
