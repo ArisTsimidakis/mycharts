@@ -185,9 +185,11 @@ class LookupClass:
     """
 
     _LOOKUP = {
-        "kubernetes:S6892": "check_4",  # Specify a CPU request
-        "kubernetes:S6873": "check_1",  # Specify a memory request
-        "kubernetes:S6864": "check_2",  # Specify a memory limit
+        "kubernetes:S6892": "check_4",   # Specify a CPU request
+        "kubernetes:S6873": "check_1",   # Specify a memory request
+        "kubernetes:S6864": "check_2",   # Specify a memory limit
+        "kubernetes:S6897": "check_17",  # Specify a storage request
+        "kubernetes:S6870": "check_16"   # Specify a storage limit
     }
 
     @classmethod

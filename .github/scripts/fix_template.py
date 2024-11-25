@@ -662,6 +662,80 @@ def set_memory_request(obj: dict, value="128Mi"):
     else:
         obj["resources"]["requests"]["memory"] = value
 
+def set_storage_limit(obj: dict, value="1Gi"):
+    """Set the storage limit to each K8s object.
+
+    Policy: Storage limits should be set.
+    
+    Args:
+        obj (dict): K8s object to modify.
+        value (str): The value to set the storage limit to.
+    """
+
+    # If resources are not set, initialize them
+    if "resources" not in obj or obj["resources"] is None or not obj["resources"]:
+        obj["resources"] = {
+            "limits": {
+                "storage": value
+            }
+        }
+        set_storage_request(obj, value)
+        set_cpu_limit(obj)
+        set_cpu_request(obj)
+        set_memory_limit(obj)
+        set_memory_request(obj)
+
+    # Check if requests already define storage and inherit its value
+    if "requests" in obj["resources"] and obj["resources"]["requests"]:
+        if "storage" in obj["resources"]["requests"]:
+            value = obj["resources"]["requests"]["storage"]
+
+    # Ensure storage limit is set
+    if "limits" not in obj["resources"] or not obj["resources"]["limits"]:
+        obj["resources"]["limits"] = {
+            "storage": value
+        }
+    else:
+        obj["resources"]["limits"]["storage"] = value
+
+
+def set_storage_request(obj: dict, value="1Gi"):
+    """Set the storage request to each K8s object.
+
+    Policy: Storage requests should be set.
+    
+    Args:
+        obj (dict): K8s object to modify.
+        value (str): The value to set the storage request to.
+    """
+
+    # If resources are not set, initialize them
+    if "resources" not in obj or obj["resources"] is None or not obj["resources"]:
+        obj["resources"] = {
+            "requests": {
+                "storage": value
+            }
+        }
+        set_storage_limit(obj, value)
+        set_cpu_limit(obj)
+        set_cpu_request(obj)
+        set_memory_limit(obj)
+        set_memory_request(obj)
+
+    # Check if limits already define storage and inherit its value
+    if "limits" in obj["resources"] and obj["resources"]["limits"]:
+        if "storage" in obj["resources"]["limits"]:
+            value = obj["resources"]["limits"]["storage"]
+
+    # Ensure storage request is set
+    if "requests" not in obj["resources"] or not obj["resources"]["requests"]:
+        obj["resources"]["requests"] = {
+            "storage": value
+        }
+    else:
+        obj["resources"]["requests"]["storage"] = value
+
+
 
 def set_equal_requests(obj: dict):
     """Set memory requests equal to memory limits.
@@ -1984,8 +2058,8 @@ class FuncLookupClass:
     "check_13": set_uid,
     "check_14": set_root,
     "check_15": remove_docker_socket, 
-    "check_16": todo,
-    "check_17": todo,
+    "check_16": set_storage_limit,
+    "check_17": set_storage_request,
     "check_18": todo,
     "check_19": todo,
     "check_20": todo,
