@@ -209,10 +209,12 @@ spec:
         resources:
           limits:
             memory: 128Mi
+            storage: 1Gi
             cpu: 1000m
           requests:
             cpu: 1000m
             memory: 128Mi
+            storage: 1Gi
         volumeMounts:
         - name: datadir
           mountPath: /bitnami/mongodb
