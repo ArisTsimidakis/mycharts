@@ -77,6 +77,7 @@ def main():
         # result_path = f"test_files/{tool}_results.json"
 
         # Check if there are any failed tests
+        print(f"tool: {tool}")
 
         match tool:
             case "checkov": 
