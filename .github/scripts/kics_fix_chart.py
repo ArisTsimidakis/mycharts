@@ -192,6 +192,8 @@ def kics_fix_issue(check: str, template: dict, check_id: str) -> str:
             "resource_path": resource_path,
             "obj_path": obj_path
         }
+        
+        print(paths)
 
         if "." in obj_path:
             paths["obj_path"] = obj_path.replace(".", "/")
