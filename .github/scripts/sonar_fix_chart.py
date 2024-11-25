@@ -95,7 +95,7 @@ def iterate_checks(chart_folder: str, json_path: str) -> None:
     print(", ".join(all_checks))
 
 
-    name = f"fixed_{chart_folder}_sonar_fixed"
+    name = f"fixed_{chart_folder}_sonarcloud_fixed"
     fix_template.save_yaml_template(template, name)
 
 
