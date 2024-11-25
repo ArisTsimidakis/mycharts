@@ -205,7 +205,7 @@ spec:
       initContainers: null
       containers:
       - name: mysql
-        image: docker.io/bitnami/mysql:8.0-bookworm@sha256:ca94d886e43c0541f834572c6861097113aa71d98fbc9bcce8a44ad3ec81a5e5
+        image: docker.io/bitnami/mysql:9.1.0-oraclelinux9@sha256:8689c5f93826d949b43a4b7613f9216499694a3082bdc372094a2910082aa391
         imagePullPolicy: Always
         securityContext:
           runAsNonRoot: false
