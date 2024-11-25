@@ -32,7 +32,7 @@ jobs:
           ref: 'main'
       
       - name: Debug iteration 
-        run: echo "Iteration: ${{ inputs.iteration }}"
+        run: echo ${{ inputs.iteration }}
 
       - name: Download result scan artifact
         uses: actions/download-artifact@v3
