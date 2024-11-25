@@ -268,7 +268,7 @@ apiVersion: v1
 kind: ResourceQuota
 metadata:
   name: pods-high
-  namespace: test-ns
+  namespace: busybox-namespace
 spec:
   hard:
     cpu: '1000'
