@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: release-name-mongodb
-  namespace: busybox-namespace
+  namespace: default
   labels:
     app.kubernetes.io/name: mongodb
     helm.sh/chart: mongodb-13.15.1
@@ -10,13 +10,13 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 secrets:
 - name: release-name-mongodb
-automountServiceAccountToken: false
+automountServiceAccountToken: true
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: release-name-mongodb
-  namespace: busybox-namespace
+  namespace: default
   labels:
     app.kubernetes.io/name: mongodb
     helm.sh/chart: mongodb-13.15.1
@@ -31,7 +31,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-mongodb-common-scripts
-  namespace: busybox-namespace
+  namespace: default
   labels:
     app.kubernetes.io/name: mongodb
     helm.sh/chart: mongodb-13.15.1
@@ -83,7 +83,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: release-name-mongodb
-  namespace: busybox-namespace
+  namespace: default
   labels:
     app.kubernetes.io/name: mongodb
     helm.sh/chart: mongodb-13.15.1
@@ -107,15 +107,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: release-name-mongodb
-  namespace: busybox-namespace
+  namespace: default
   labels:
     app.kubernetes.io/name: mongodb
     helm.sh/chart: mongodb-13.15.1
     app.kubernetes.io/instance: release-name
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: mongodb
-  annotations:
-    seccomp.security.alpha.kubernetes.io/pod: runtime/default
 spec:
   replicas: 1
   strategy:
@@ -133,8 +131,6 @@ spec:
         app.kubernetes.io/instance: release-name
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: mongodb
-      annotations:
-        container.apparmor.security.beta.kubernetes.io/mongodb: runtime/default
     spec:
       serviceAccountName: release-name-mongodb
       affinity:
@@ -154,26 +150,25 @@ spec:
         fsGroup: 1001
         sysctls: []
         runAsUser: 1000
-        seccompProfile:
-          type: RuntimeDefault
       containers:
       - name: mongodb
         image: docker.io/bitnami/mongodb:6.0.6-debian-11-r3
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         securityContext:
           runAsNonRoot: false
           runAsUser: 1000
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-          readOnlyRootFilesystem: false
           runAsGroup: 1000
+          readOnlyRootFilesystem: false
         env:
         - name: BITNAMI_DEBUG
           value: 'false'
         - name: MONGODB_ROOT_USER
           value: root
+        - name: MONGODB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: release-name-mongodb
+              key: mongodb-root-password
         - name: ALLOW_EMPTY_PASSWORD
           value: 'no'
         - name: MONGODB_SYSTEM_LOG_VERBOSITY
@@ -213,10 +208,10 @@ spec:
             - /bitnami/scripts/readiness-probe.sh
         resources:
           limits:
-            cpu: 250m
             memory: 128Mi
+            cpu: 1000m
           requests:
-            cpu: 250m
+            cpu: 1000m
             memory: 128Mi
         volumeMounts:
         - name: datadir
@@ -224,9 +219,6 @@ spec:
           subPath: null
         - name: common-scripts
           mountPath: /bitnami/scripts
-        - name: secret-volume
-          readOnly: true
-          mountPath: /etc/secret-volume
       volumes:
       - name: common-scripts
         configMap:
@@ -235,66 +227,3 @@ spec:
       - name: datadir
         persistentVolumeClaim:
           claimName: release-name-mongodb
-      - name: secret-volume
-        secret:
-          secretName: my-secret
----
-apiVersion: v1
-kind: LimitRange
-metadata:
-  name: cpu-min-max-demo-lr
-  namespace: test-ns
-spec:
-  limits:
-  - max:
-      cpu: 800m
-    min:
-      cpu: 250m
-    type: Container
----
-apiVersion: v1
-kind: LimitRange
-metadata:
-  name: cpu-min-max-demo-lr
-  namespace: default
-spec:
-  limits:
-  - max:
-      cpu: 800m
-    min:
-      cpu: 250m
-    type: Container
----
-apiVersion: v1
-kind: ResourceQuota
-metadata:
-  name: pods-high
-  namespace: busybox-namespace
-spec:
-  hard:
-    cpu: '1000'
-    memory: 200Gi
-    pods: '10'
-  scopeSelector:
-    matchExpressions:
-    - operator: In
-      scopeName: PriorityClass
-      values:
-      - high
----
-apiVersion: v1
-kind: ResourceQuota
-metadata:
-  name: pods-high
-  namespace: default
-spec:
-  hard:
-    cpu: '1000'
-    memory: 200Gi
-    pods: '10'
-  scopeSelector:
-    matchExpressions:
-    - operator: In
-      scopeName: PriorityClass
-      values:
-      - high
