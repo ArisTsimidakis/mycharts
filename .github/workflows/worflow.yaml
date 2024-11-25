@@ -7,13 +7,13 @@ on:
       chart_folder:
         description: 'The path to the Helm Chart folder'
         required: true
-        default: 'mysql'
+        default: 'mongodb'
         type: string
 
       first_tool:
         description: 'The first tool to analyze the chart'
         required: true
-        default: 'checkov'
+        default: 'sonarcloud'
         type: string
       
       second_tool:

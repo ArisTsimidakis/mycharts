@@ -1,0 +1,93 @@
+name: Run SonarCloud
+
+on:
+  workflow_call:
+    inputs:
+
+      iteration:
+        required: true
+        type: string
+
+      chart_folder:
+        required: true
+        type: string
+    
+    secrets:
+      
+        SONAR_TOKEN: 
+          description: 'SonarCloud API token'
+          required: true
+
+jobs:
+
+  run_sonarcloud:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: 'main'
+          fetch-depth: 0
+
+      - name: Define template chart folder - original
+        if: ${{ inputs.iteration == '1'}}
+        run: echo "TEMPLATE=templates/${{ inputs.chart_folder }}_template.yaml" >> $GITHUB_ENV
+
+      - name: Define template chart folder - fixed
+        if: ${{ inputs.iteration == '2'}}
+        run: echo "TEMPLATE=fixed_templates/${{ inputs.chart_folder }}_${{ inputs.first_tool }}_fixed_template.yaml" >> $GITHUB_ENV
+
+      - name: Define template chart folder - functionalities
+        if: ${{ inputs.iteration == '3'}}
+        run: echo "TEMPLATE=functionality_templates/${{ inputs.chart_folder }}_func_template.yaml" >> $GITHUB_ENV
+
+      - name: Create sonar-project.properties
+        shell: bash
+        run: |
+          echo "sonar.organization=aristsimidakis" > sonar-project.properties
+          echo "sonar.projectKey=ArisTsimidakis_mycharts" >> sonar-project.properties
+          echo "sonar.projectName=mycharts" >> sonar-project.properties
+          echo "sonar.sources=templates/${{ inputs.chart_folder }}_template.yaml" >> sonar-project.properties
+
+      - name: Run SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@v3.1
+        with:
+          args: >
+            -Dsonar.verbose=true
+            -Dsonar.log_level=DEBUG
+            -Dsonar.scanner.dumpToFile=sonar-scanner-dump.log
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Wait for SonarCloud😭
+        run: sleep 10
+      
+      - name: Fetch SonarCloud Report
+        shell: bash
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          PROJECT_KEY="ArisTsimidakis_mycharts"
+          ORGANIZATION="aristsimidakis"
+          PARAMS="s=UPDATE_DATE&issueStatuses=OPEN%2CCONFIRMED&ps=100&facets=cleanCodeAttributeCategories%2CimpactSoftwareQualities%2CimpactSeverities"
+          SONAR_API="https://sonarcloud.io/api/issues/search?${PARAMS}&componentKeys=${PROJECT_KEY}&organization=${ORGANIZATION}&additionalFields=_all"
+
+          curl --request GET --url $SONAR_API > results_${{ inputs.iteration }}.json
+      
+      - name: Print SonarCloud result
+        shell: bash
+        run: jq . results_${{ inputs.iteration }}.json  # inputs.chart_folder = "harbor"
+
+      - name: Upload the JASON results artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: results_${{ inputs.iteration }}
+          path: results_${{ inputs.iteration }}.json
+          if-no-files-found: error
+      
+      - name: Clean up sonar-project.properties
+        shell: bash
+        run: rm sonar-project.properties
+
+
+      
